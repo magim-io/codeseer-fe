@@ -1,0 +1,28 @@
+.codebase-plus-icon {
+  &:hover {
+    .codebase-plus-dropdown {
+      transform: scale(1);
+      opacity: 1;
+      visibility: visible;
+    }
+    &::before {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+}
+
+.codebase-plus-dropdown {
+  top: calc(100% + 10px);
+}
+
+.codebase-plus-dropdown {
+  &::before {
+    content: 'a';
+    color: transparent;
+    width: 100%;
+    position: absolute;
+    right: 0;
+    top: -10px;
+  }
+}
