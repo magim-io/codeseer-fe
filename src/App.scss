@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  font-family: "Roboto", "Open Sans", "sans-serif";
+  font-size: 14px;
+  color: #172b4d;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    background-color: #d8d8d8;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 12px;
+    background-color: #29678c;
+  }
+  scroll-behavior: smooth;
+}

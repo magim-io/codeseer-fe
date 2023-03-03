@@ -1,5 +1,7 @@
-import data from './output.json';
-import { Node } from 'reactflow';
+/* eslint-disable no-param-reassign */
+import { Node } from "reactflow";
+
+import data from "./output.json";
 
 interface IObject {
   name?: any;
@@ -7,23 +9,21 @@ interface IObject {
   data?: any;
 }
 
-const temp = data.nodes.map((n) => {
-  return n.source.split('/');
-});
+const temp = data.nodes.map((n) => n.source.split("/"));
 const result: any[] = [];
 const final = { result };
 
 temp.forEach((a: any) => {
   a.reduce((r: any, name: any, i: any, arr: any) => {
     if (!r[name]) {
-      const obj: IObject = { name: name };
+      const obj: IObject = { name };
       r[name] = { result: [] };
       if (arr[i + 1] && name != null) {
         obj.children = r[name].result;
       }
 
-      if (name.includes('.')) {
-        const otherChild = data.edges.filter((e) => e.from === arr.join('/'));
+      if (name.includes(".")) {
+        const otherChild = data.edges.filter((e) => e.from === arr.join("/"));
 
         obj.children = otherChild.map((oC) => ({
           name: oC.to,
@@ -31,11 +31,11 @@ temp.forEach((a: any) => {
         }));
       }
 
-      if (obj.name.includes('.')) {
-        obj.name = arr.join('/');
+      if (obj.name.includes(".")) {
+        obj.name = arr.join("/");
         obj.data = data.nodes.find(
           (item) =>
-            item.source.split('/')[item.source.split('/').length - 1] ===
+            item.source.split("/")[item.source.split("/").length - 1] ===
             obj.name
         );
       }
@@ -46,9 +46,9 @@ temp.forEach((a: any) => {
     return r[name];
   }, final);
 });
-let arr = new Map();
+const arr = new Map();
 const convertToReactFlowFormat = (treeNode: any) => {
-  if (treeNode.name.includes('.')) {
+  if (treeNode.name.includes(".")) {
     if (treeNode.children && treeNode.children.length > 0) {
       arr.set(treeNode.name, {
         id: treeNode.name,
@@ -61,7 +61,7 @@ const convertToReactFlowFormat = (treeNode: any) => {
           x: 0,
           y: 0,
         },
-        type: 'selectorNode',
+        type: "selectorNode",
       });
     } else {
       arr.set(treeNode.name, {
@@ -74,7 +74,7 @@ const convertToReactFlowFormat = (treeNode: any) => {
           x: 0,
           y: 0,
         },
-        type: 'selectorNode',
+        type: "selectorNode",
       });
     }
   } else {
@@ -87,7 +87,7 @@ const convertToReactFlowFormat = (treeNode: any) => {
       data: {
         label: treeNode.name,
       },
-      type: 'selectorNode',
+      type: "selectorNode",
       children: treeNode.children,
       className: `reactflow_node_${treeNode.name}`,
     });
@@ -104,8 +104,8 @@ export const initialNodes: Node[] = result.map((item, index) => ({
     x: 0,
     y: index * 20,
   },
-  type: 'selectorNode',
-  data: !item.name.includes('.')
+  type: "selectorNode",
+  data: !item.name.includes(".")
     ? {
         label: item.name,
         children: item.children ? item.children : undefined,
@@ -118,15 +118,13 @@ export const initialNodes: Node[] = result.map((item, index) => ({
         depth: 0,
       },
   style: {
-    border: '1px solid black',
-    borderRadius: '8px',
+    border: "1px solid black",
+    borderRadius: "8px",
   },
 }));
 
 export const initialEdges = result
-  .filter(
-    (item, index) => data.edges.find((e) => e.from === item.name) !== undefined
-  )
+  .filter((item) => data.edges.find((e) => e.from === item.name) !== undefined)
   .map((item) => ({
     id: `${item.from}-${item.to}`,
     source: item.from,

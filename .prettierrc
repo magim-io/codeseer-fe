@@ -1,0 +1,14 @@
+{
+  "prettier/prettier": [
+    "error",
+    {
+      "singleQuote": true,
+      "printWidth": 80,
+      "trailingComma": "es5",
+      "usePrettierrc": false,
+      "semi": true,
+      "no-mixed-spaces-and-tabs": ["error", "smart-tabs"],
+      "no-unused-vars": ["error"]
+    }
+  ]
+}

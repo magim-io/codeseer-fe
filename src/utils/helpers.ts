@@ -1,4 +1,4 @@
-import { Position, MarkerType, Node } from 'reactflow';
+import { MarkerType, Position } from "reactflow";
 
 // this helper function returns the intersection point
 // of the line between the center of the intersectionNode and the target node
@@ -77,21 +77,21 @@ export function createNodesAndEdges() {
   const edges = [];
   const center = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
-  nodes.push({ id: 'target', data: { label: 'Target' }, position: center });
+  nodes.push({ id: "target", data: { label: "Target" }, position: center });
 
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 8; i += 1) {
     const degrees = i * (360 / 8);
     const radians = degrees * (Math.PI / 180);
     const x = 250 * Math.cos(radians) + center.x;
     const y = 250 * Math.sin(radians) + center.y;
 
-    nodes.push({ id: `${i}`, data: { label: 'Source' }, position: { x, y } });
+    nodes.push({ id: `${i}`, data: { label: "Source" }, position: { x, y } });
 
     edges.push({
       id: `edge-${i}`,
-      target: 'target',
+      target: "target",
       source: `${i}`,
-      type: 'floating',
+      type: "floating",
       markerEnd: {
         type: MarkerType.Arrow,
       },
@@ -103,16 +103,16 @@ export function createNodesAndEdges() {
 
 export function getNodeSize(name: string) {
   // Get the biggest Size
-  let dummy = document.createElement('span');
-  dummy.style.visibility = 'hidden';
-  dummy.style.fontSize = '16px';
-  dummy.style.padding = '4px';
+  const dummy = document.createElement("span");
+  dummy.style.visibility = "hidden";
+  dummy.style.fontSize = "16px";
+  dummy.style.padding = "4px";
   dummy.innerHTML = name;
   document.body.appendChild(dummy);
 
   // Get the width of the dummy element and set it as the width of the div
-  let dummyWidth = dummy.offsetWidth;
-  let dummyHeight = dummy.offsetHeight;
+  const dummyWidth = dummy.offsetWidth;
+  const dummyHeight = dummy.offsetHeight;
 
   // Remove the dummy element
   document.body.removeChild(dummy);

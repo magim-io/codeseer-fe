@@ -1,6 +1,19 @@
-import CustomNode from './CustomNode/CustomNode';
-import Navbar from './Navbar/Navbar';
-import FloatingConnectionLine from './FloatingConnectionLine/FloatingConnectionLine';
-import FloatingEdge from './FloatingEdge/FloatingEdge';
+import CreateOrganization from "./CreateOrganization/CreateOrganization";
+import CustomNode from "./CustomNode/CustomNode";
+import FloatingConnectionLine from "./FloatingConnectionLine/FloatingConnectionLine";
+import FloatingEdge from "./FloatingEdge/FloatingEdge";
+import Footer from "./Footer/Footer";
+import LayoutedComponent from "./LayoutedComponent/LayoutedComponent";
+import Navbar from "./Navbar/Navbar";
+import Sidebar from "./Sidebar/Sidebar";
 
-export { CustomNode, Navbar, FloatingConnectionLine, FloatingEdge };
+export {
+  CustomNode,
+  Navbar,
+  FloatingConnectionLine,
+  FloatingEdge,
+  Footer,
+  LayoutedComponent,
+  CreateOrganization,
+  Sidebar,
+};

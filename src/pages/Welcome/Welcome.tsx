@@ -1,14 +1,16 @@
-import React from 'react';
-import banner from '../../assets/images/bg-banner.png';
-import './style.scss';
-import logo from '../../assets/images/codeseer_logo.png';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
-const Welcome = () => {
+import banner from "../../assets/images/bg-banner.png";
+import logo from "../../assets/images/codeseer_logo.png";
+
+import "./style.scss";
+
+function Welcome() {
   const navigate = useNavigate();
 
   const navigateLoginPage = () => {
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
@@ -34,6 +36,7 @@ const Welcome = () => {
             </span>
           </div>
           <button
+            type="button"
             className="px-6 py-1 flex items-center rounded-2xl text-lg text-white font-semibold bg-drark_blue bg-opacity-80 hover:bg-opacity-95"
             onClick={navigateLoginPage}
           >
@@ -53,6 +56,7 @@ const Welcome = () => {
               eiusmod tempor incididunt ut.
             </p>
             <button
+              type="button"
               className="w-fit px-6 py-1 rounded-lg bg-drark_blue text-white drop-shadow-2xl"
               onClick={navigateLoginPage}
             >
@@ -64,6 +68,6 @@ const Welcome = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Welcome;

@@ -1,20 +1,12 @@
-import React from 'react';
-import './App.css';
-import { Home, Welcome, Codebase, Login } from './pages';
-import { Routes, Route } from 'react-router-dom';
-import { Navbar } from './components';
-import CreateOrganization from './pages/Home/CreateOrganization/CreateOrganization';
+import React from "react";
+import { Route, Routes } from "react-router-dom";
+
+import { LayoutedComponent } from "./components";
+import { Codebase, Home, Login, Organization, Welcome } from "./pages";
+
+import "./App.scss";
 
 function App() {
-  const LayoutedComponent = ({ component }: any): JSX.Element => {
-    return (
-      <div className="w-full min-h-screen flex flex-col">
-        <Navbar />
-        <div className="flex-grow">{component}</div>
-      </div>
-    );
-  };
-
   return (
     <div className="App">
       <Routes>
@@ -26,12 +18,12 @@ function App() {
           element={<LayoutedComponent component={<Home />} />}
         />
         <Route
-          path="home/create-organization"
-          element={<LayoutedComponent component={<CreateOrganization />} />}
-        />
-        <Route
           path="codebase"
           element={<LayoutedComponent component={<Codebase />} />}
+        />
+        <Route
+          path="organization"
+          element={<LayoutedComponent component={<Organization />} />}
         />
       </Routes>
     </div>

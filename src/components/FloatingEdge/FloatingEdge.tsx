@@ -1,7 +1,7 @@
-import { useCallback } from 'react';
-import { useStore, getBezierPath } from 'reactflow';
+import { useCallback } from "react";
+import { getBezierPath, useStore } from "reactflow";
 
-import { getEdgeParams } from '../../utils/helpers';
+import { getEdgeParams } from "../../utils/helpers";
 
 function FloatingEdge({ id, source, target, markerEnd, style }: any) {
   const sourceNode = useStore(
