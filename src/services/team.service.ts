@@ -16,7 +16,7 @@ class TeamService {
     payload,
   }: ICreateTeam): Promise<AxiosResponse> {
     const res = await interceptor.post("/teams", {
-      orgId,
+      organizationId: orgId,
       payload,
     });
 

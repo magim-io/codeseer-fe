@@ -1,17 +1,22 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ReactQuill from "react-quill";
+import { toast } from "react-toastify";
 
 import { ChevronDown, CloseIcon } from "../../Icons";
-import OrganizationService from "../../services/organization.service";
+import DomainService from "../../services/domain.service";
+import TeamService from "../../services/team.service";
+import { ITeam } from "../../types/team/team.interface";
 
 import "./CreateDomainForm.style.scss";
 
 function CreateDomainForm({ setIsShown }: any) {
   const labelDropdown = useRef<HTMLUListElement>(null);
-  const [selectedLabel, setSelectedLabel] = useState("");
+  const [selectedTeam, setSelectedTeam] = useState<ITeam>();
   const [value, setValue] = useState("");
+  const [teams, setTeams] = useState<ITeam[]>([]);
 
   const openLabelDropdown = () => {
     if (labelDropdown.current!!.classList.contains("invisible")) {
@@ -29,29 +34,48 @@ function CreateDomainForm({ setIsShown }: any) {
     setIsShown(false);
   };
 
-  const selectAssignedTeam = (label: string) => {
-    setSelectedLabel(label);
+  const selectAssignedTeam = (team: ITeam) => {
+    setSelectedTeam(team);
     openLabelDropdown();
   };
 
-  const handleCreateOrg = async (event: any) => {
+  const handleCreateDomain = async (event: any) => {
     event.preventDefault();
-    const { organizationName, organizationLogin } = event.target;
+    const { domainName, domainDirectory, domainRepository } = event.target;
 
     try {
-      const res = await OrganizationService.createNewOrganization({
-        login: organizationLogin.value as string,
-        name: organizationName.value,
-        description: value,
+      const res = await DomainService.createNewDomain({
+        teamId: selectedTeam?.teamId as string,
+        payload: {
+          name: domainName.value,
+          directory: domainDirectory.value,
+          repository: domainRepository.value,
+        },
       });
 
       if (res.data.success) {
+        toast.success(`Create domain ${domainName.value} successfully!`);
         closeModal();
       }
     } catch (error) {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    const fetchTeams = async () => {
+      try {
+        const res = await TeamService.retrieveTeams();
+        if (res.data.success) {
+          setTeams(res.data.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchTeams();
+  }, []);
 
   return (
     <section className="fixed inset-0  py-14  flex justify-center z-20">
@@ -60,7 +84,7 @@ function CreateDomainForm({ setIsShown }: any) {
         onClick={closeModal}
       />
       <form
-        onSubmit={handleCreateOrg}
+        onSubmit={handleCreateDomain}
         className="w-[600px]   flex flex-col bg-white rounded-xl z-40 "
       >
         <div className=" p-6 border-b border-md_blue flex justify-between">
@@ -102,14 +126,14 @@ function CreateDomainForm({ setIsShown }: any) {
           </div>
           <div className="flex flex-col gap-3">
             <label htmlFor="domain_repository" className="text-lg font-medium">
-              Repositorys
+              Repositories
             </label>
             <input
               id="domain_repository"
               name="domainRepository"
               type="text"
               className="py-4 px-7 border border-gray-400 rounded-md placeholder:text-gray-500"
-              placeholder="Ken-nguyen-2000"
+              placeholder="Lost-and-Found, Facebook-clone,..."
               required
             />
             <a
@@ -128,7 +152,7 @@ function CreateDomainForm({ setIsShown }: any) {
               name="domainDirectory"
               type="text"
               className="py-4 px-7 border border-gray-400 rounded-md placeholder:text-gray-500"
-              placeholder="Ken-nguyen-2000"
+              placeholder="src/components/, src/, root/, dist/,..."
               required
             />
           </div>
@@ -142,7 +166,7 @@ function CreateDomainForm({ setIsShown }: any) {
               onClick={openLabelDropdown}
             >
               <div className="flex items-center justify-between py-4 px-7 border border-gray-400 rounded-md text-gray-500">
-                <span>{selectedLabel !== "" ? selectedLabel : "Team"}</span>
+                <span>{selectedTeam ? selectedTeam.team.name : "Team"}</span>
                 <ChevronDown className="w-5 h-5" />
               </div>
             </button>
@@ -151,38 +175,17 @@ function CreateDomainForm({ setIsShown }: any) {
               className="create-organization-label__dropdown absolute top-full z-10 mt-2 max-h-56 w-full overflow-auto rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none transition ease-in duration-100 opacity-0 invisible"
               role="listbox"
             >
-              <li
-                className="py-4 px-6 cursor-pointer hover:bg-primary_blue hover:text-white"
-                role="option"
-                aria-selected
-                onClick={selectAssignedTeam.bind(null, "NewYork")}
-              >
-                New york
-              </li>
-              <li
-                className="py-4 px-6 cursor-pointer hover:bg-primary_blue hover:text-white"
-                role="option"
-                aria-selected
-                onClick={selectAssignedTeam.bind(null, "Vietname")}
-              >
-                Vietname
-              </li>
-              <li
-                className="py-4 px-6 cursor-pointer hover:bg-primary_blue hover:text-white"
-                role="option"
-                aria-selected
-                onClick={selectAssignedTeam.bind(null, "Malaysia")}
-              >
-                Malaysia
-              </li>
-              <li
-                className="py-4 px-6 cursor-pointer hover:bg-primary_blue hover:text-white"
-                role="option"
-                aria-selected
-                onClick={selectAssignedTeam.bind(null, "Mahasa")}
-              >
-                Mahasa
-              </li>
+              {teams.map((team: ITeam) => (
+                <li
+                  key={team.teamId}
+                  className="py-4 px-6 cursor-pointer hover:bg-primary_blue hover:text-white"
+                  role="option"
+                  aria-selected
+                  onClick={selectAssignedTeam.bind(null, team)}
+                >
+                  {team.team.name}
+                </li>
+              ))}
             </ul>
           </div>
           <div className="flex flex-col gap-3 relative mb-10">

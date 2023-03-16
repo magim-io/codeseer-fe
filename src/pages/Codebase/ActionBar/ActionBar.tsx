@@ -1,5 +1,8 @@
 import React from "react";
 
+import FolderTree from "../../../components/FolderTree/FolderTree";
+import { explorer } from "../initial_setup";
+
 function ActionBar() {
   return (
     <div className="w-[400px] p-3 bg-light_white flex flex-col gap-3">
@@ -20,7 +23,9 @@ function ActionBar() {
           </li>
         </ul>
       </div>
-      <div className="flex-grow w-full bg-white" />
+      <div className="flex-grow w-full max-h-[600px] py-2 px-4 bg-white overflow-y-scroll ">
+        <FolderTree explorer={explorer[0]} />
+      </div>
       <fieldset className="h-[200px] w-full bg-white rounded-lg px-4 py-5">
         <legend className="sr-only">Rules</legend>
         <div

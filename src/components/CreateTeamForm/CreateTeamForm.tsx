@@ -2,8 +2,9 @@
 import React, { useRef, useState } from "react";
 
 import { ChevronDown, CloseIcon } from "../../Icons";
+import TeamService from "../../services/team.service";
 
-function CreateTeamForm({ setIsShown }: any) {
+function CreateTeamForm({ setIsShown, orgId }: any) {
   const labelDropdown = useRef<HTMLUListElement>(null);
   const [selectedLabel, setSelectedLabel] = useState("");
 
@@ -28,7 +29,24 @@ function CreateTeamForm({ setIsShown }: any) {
     openLabelDropdown();
   };
 
-  const handleCreateTeam = () => {};
+  const handleCreateTeam = async (event: any) => {
+    event.preventDefault();
+    const { teamName, teamLogin } = event.target;
+    try {
+      const res = await TeamService.createNewTeam({
+        orgId,
+        payload: {
+          login: teamLogin.value,
+          name: teamName.value,
+        },
+      });
+      if (res.data.success) {
+        closeModal();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <section className="fixed inset-0  py-14  flex justify-center z-20">
@@ -38,13 +56,13 @@ function CreateTeamForm({ setIsShown }: any) {
       />
       <form
         onSubmit={handleCreateTeam}
-        className="w-[600px] h-fit overflow-y-auto  flex flex-col bg-white rounded-xl z-40 "
+        className="w-[600px] h-fit flex flex-col bg-white rounded-xl z-40 "
       >
         <div className=" p-6 border-b border-md_blue flex justify-between">
           <h1 className="text-md_blue text-3xl font-semibold">Create Team</h1>
           <CloseIcon onClick={closeModal} />
         </div>
-        <div className="w-full h-full flex flex-col gap-5 px-6 pt-4 pb-8">
+        <div className="w-full flex flex-col gap-5 px-6 pt-4 pb-8 h-fit overflow-y-auto">
           <div className=" flex flex-col gap-3">
             <label htmlFor="team_name" className="text-lg font-medium">
               Name
@@ -68,22 +86,6 @@ function CreateTeamForm({ setIsShown }: any) {
               type="text"
               className="py-4 px-7 border border-gray-400 rounded-md placeholder:text-gray-500"
               placeholder="CodeSeer, Magim, Four,..."
-              required
-            />
-          </div>
-          <div className=" flex flex-col gap-3">
-            <label
-              htmlFor="team_maximum_members"
-              className="text-lg font-medium"
-            >
-              Maximum Members
-            </label>
-            <input
-              id="team_maximum_members"
-              name="teamMaximumMembers"
-              type="text"
-              className="py-4 px-7 border border-gray-400 rounded-md placeholder:text-gray-500"
-              placeholder="Meta, Google, Azure,..."
               required
             />
           </div>

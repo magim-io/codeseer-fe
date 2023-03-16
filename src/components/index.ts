@@ -1,3 +1,6 @@
+import EyeClosedIcon from "../Icons/EyeClosedIcon";
+import EyeFilledIcon from "../Icons/EyeFilledIcon";
+
 import CreateOrganization from "./CreateOrganization/CreateOrganization";
 import CustomNode from "./CustomNode/CustomNode";
 import FloatingConnectionLine from "./FloatingConnectionLine/FloatingConnectionLine";
@@ -16,4 +19,6 @@ export {
   LayoutedComponent,
   CreateOrganization,
   Sidebar,
+  EyeClosedIcon,
+  EyeFilledIcon,
 };

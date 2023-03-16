@@ -12,6 +12,7 @@ import PlusIcon from "./PlusIcon";
 import SearchIcon from "./Search";
 import Settings from "./Settings";
 import TagIcon from "./TagIcon";
+import UsersIcon from "./UsersIcon";
 
 export {
   HomeIcon,
@@ -28,4 +29,5 @@ export {
   TagIcon,
   FolderIcon,
   FileCodeIcon,
+  UsersIcon,
 };

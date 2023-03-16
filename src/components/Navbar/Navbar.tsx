@@ -47,6 +47,7 @@ function Navbar() {
           setIsShown={setShowCreateDomain}
         />
       )}
+
       <div className="navbar flex justify-between items-center px-12 py-4  border-b border-gray-300 bg-md_blue z-10 shadow-sm">
         {/* ***************************LEFT NAV BAR******************************* */}
         <div className="flex gap-4 items-center cursor-pointer">

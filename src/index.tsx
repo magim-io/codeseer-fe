@@ -6,6 +6,7 @@ import { ReactFlowProvider } from "reactflow";
 import App from "./App";
 
 // eslint-disable-next-line import/no-extraneous-dependencies
+import "react-toastify/dist/ReactToastify.css";
 import "react-quill/dist/quill.snow.css";
 import "reactflow/dist/style.css";
 

@@ -96,6 +96,7 @@ const convertToReactFlowFormat = (treeNode: any) => {
     });
   }
 };
+export const explorer = result;
 convertToReactFlowFormat(result[0]);
 
 export const initialNodes: Node[] = result.map((item, index) => ({

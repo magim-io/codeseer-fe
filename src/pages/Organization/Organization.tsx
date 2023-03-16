@@ -14,6 +14,7 @@ import { ITeam } from "../../types/team/team.interface";
 
 function Organization() {
   const { organizationId } = useParams();
+
   const [organization, setOrganization] = useState<IOrganization>();
   const [domains, setDomains] = useState<IDomain[]>([]);
   const [teams, setTeams] = useState<ITeam[]>([]);
@@ -25,7 +26,6 @@ function Organization() {
           organizationId as string
         );
         if (res.data.success) {
-          console.log(res);
           setOrganization(res.data.data);
         }
       } catch (error) {
@@ -37,7 +37,6 @@ function Organization() {
       try {
         const res = await DomainService.retrieveDomains();
         if (res.data.success) {
-          console.log(res);
           setDomains(res.data.data);
         }
       } catch (error) {
@@ -49,7 +48,6 @@ function Organization() {
       try {
         const res = await TeamService.retrieveTeams();
         if (res.data.success) {
-          console.log(res);
           setTeams(res.data.data);
         }
       } catch (error) {

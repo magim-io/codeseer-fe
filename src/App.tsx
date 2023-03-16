@@ -1,5 +1,7 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { ToastContainer } from "react-toastify";
 
 import NotFound from "./pages/NotFound/NotFound";
 import PrivateRoute from "./pages/PrivateRoute";
@@ -24,7 +26,7 @@ function App() {
             element={<LayoutedComponent component={<Home />} />}
           />
           <Route
-            path="/codebase"
+            path="/code-base"
             element={<LayoutedComponent component={<Codebase />} />}
           />
           <Route
@@ -34,6 +36,7 @@ function App() {
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <ToastContainer />
     </div>
   );
 }

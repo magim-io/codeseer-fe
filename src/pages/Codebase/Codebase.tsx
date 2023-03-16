@@ -1,9 +1,11 @@
+/* eslint-disable no-loop-func */
 import React, { useCallback } from "react";
 import {
   addEdge,
   Background,
   Controls,
   Edge,
+  MarkerType,
   MiniMap,
   Node,
   ReactFlow,
@@ -24,6 +26,12 @@ import { initialEdges, initialNodes } from "./initial_setup";
 import data from "./output.json";
 
 import "./style.scss";
+
+interface CollisionInfo {
+  collided: boolean;
+  overlapX: number;
+  overlapY: number;
+}
 
 const padding = 10;
 const gap = 10;
@@ -84,6 +92,78 @@ function getChildrenBiggestSize(node: Node) {
   return { dummyWidth, dummyHeight };
 }
 
+const getFourCornPos = (node: Node) => {
+  const nodeCorners: any = {
+    topLeft: { x: node.position.x, y: node.position.y },
+    topRight: { x: node.position.x + node.width!, y: node.position.y },
+    bottomLeft: { x: node.position.x, y: node.position.y + node.height! },
+    bottomRight: {
+      x: node.position.x + node.width!,
+      y: node.position.y + node.height!,
+    },
+  };
+
+  return nodeCorners;
+};
+
+// eslint-disable-next-line no-unused-vars
+function detectRectanglesCollision(rectA: Node, rectB: Node): CollisionInfo {
+  // Get the positions of the corners of the two rectangles
+  const rectACorners: any = {
+    topLeft: { x: rectA.position.x, y: rectA.position.y },
+    topRight: { x: rectA.position.x + rectA.width!, y: rectA.position.y },
+    bottomLeft: { x: rectA.position.x, y: rectA.position.y + rectA.height! },
+    bottomRight: {
+      x: rectA.position.x + rectA.width!,
+      y: rectA.position.y + rectA.height!,
+    },
+  };
+  const rectBCorners: any = {
+    topLeft: { x: rectB.position.x, y: rectB.position.y },
+    topRight: { x: rectB.position.x + rectB.width!, y: rectB.position.y },
+    bottomLeft: { x: rectB.position.x, y: rectB.position.y + rectB.height! },
+    bottomRight: {
+      x: rectB.position.x + rectB.width!,
+      y: rectB.position.y + rectB.height!,
+    },
+  };
+
+  // Check if any of the corners of rectA are inside rectB
+  // eslint-disable-next-line no-restricted-syntax
+  for (const corner in rectACorners) {
+    if (
+      rectACorners[corner].x >= rectBCorners.topLeft.x &&
+      rectACorners[corner].x <= rectBCorners.topRight.x &&
+      rectACorners[corner].y >= rectBCorners.topLeft.y &&
+      rectACorners[corner].y <= rectBCorners.bottomLeft.y
+    ) {
+      // Calculate the overlap rectangle
+      const overlapX = Math.max(rectA.position.x, rectB.position.x);
+      const overlapY = Math.max(rectA.position.y, rectB.position.y);
+      const overlapWidth =
+        Math.min(
+          rectA.position.x + rectA.width!,
+          rectB.position.x + rectB.width!
+        ) - overlapX;
+      const overlapHeight =
+        Math.min(
+          rectA.position.y + rectA.height!,
+          rectB.position.y + rectB.height!
+        ) - overlapY;
+      // const overlapRect = { x: overlapX, y: overlapY, width: overlapWidth, height: overlapHeight };
+
+      // Move rectB out of the collision area by adding the width and height of the overlap rectangle to its position
+      return {
+        overlapX: overlapWidth,
+        overlapY: overlapHeight,
+        collided: true,
+      };
+    }
+  }
+
+  return { overlapX: 0, overlapY: 0, collided: false };
+}
+
 function Codebase() {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>(initialEdges);
@@ -94,32 +174,142 @@ function Codebase() {
   );
 
   const createNewEdges = (selectedNode: Node, newNodes: Node[]) => {
-    console.log(selectedNode, newNodes);
+    // console.log(selectedNode, newNodes);
+    const fileNodes = newNodes.filter((n) => n.id.includes("."));
+    const allPresentNods = [...nodes, ...newNodes].filter((n) =>
+      n.id.includes(".")
+    );
 
-    // const returnEdges: any[] = childrenNodes
-    //   .filter((item: any) => {
-    //     const connects = data.edges.filter((connect) =>
-    //       connect.from.includes(item.id)
-    //     );
+    const possibleConnections = data.edges.filter((ed: any) =>
+      allPresentNods.find((fN) => ed.from.includes(fN.id))
+    );
+    console.log("fileNodes: ", fileNodes);
+    console.log("Possible Conenctions: ", possibleConnections);
+    console.log(edges);
 
-    //     return item.id.includes(".") && connects.length > 0;
-    //   })
-    //   .map((item: any) => {
-    //     const connects = data.edges.filter((connect) =>
-    //       connect.from.includes(item.id)
-    //     );
+    const currentSourceNodes = nodes.filter((n) => {
+      if (n.id.includes(".")) {
+        const haveEdge = edges.find(
+          (eds) => eds.source === n.id && eds.target === selectedNode.id
+        );
+        if (haveEdge) {
+          return n;
+        }
+      }
+      return undefined;
+    });
+    const currentEdgesToSelectedNode = edges.filter(
+      (eds) => eds.target === selectedNode.id
+    );
 
-    //     return connects.map((connect) => ({
-    //       id: `${item.id}-${connect.to}`,
-    //       source: item.id,
-    //       target: childrenNodes.find((c: any) => connect.to.includes(c.id)),
-    //       markerEnd: {
-    //         type: MarkerType.ArrowClosed,
-    //       },
-    //     }));
-    //   });
+    const possibleConnectionsToChildNode = currentSourceNodes
+      .map((curSrcNode) =>
+        data.edges.filter((ed: any) =>
+          newNodes.find(
+            (fN) =>
+              ed.from === curSrcNode.id &&
+              (fN.id.includes(".")
+                ? ed.to.includes(fN.id)
+                : ed.to.split("/").includes(fN.id))
+          )
+        )
+      )
+      .flat(1);
+    console.log("current edge to folder", currentEdgesToSelectedNode);
+    console.log(
+      "Possible connect to childnode",
+      possibleConnectionsToChildNode
+    );
 
-    // setEdges(returnEdges);
+    fileNodes.forEach((fN) => {
+      const exactConnections = possibleConnections.filter(
+        (pC) => pC.from === fN.id
+      );
+      newNodes.forEach((nN: Node) => {
+        const isFolder = !nN.id.includes(".");
+
+        if (isFolder) {
+          exactConnections.forEach((eC) => {
+            if (eC.to.split("/").includes(nN.id)) {
+              const newEdge = {
+                id: `${fN.id}~${eC.to}`,
+                source: fN.id,
+                target: nN.id,
+                markerEnd: {
+                  type: MarkerType.ArrowClosed,
+                },
+              };
+              if (!edges.find((eds) => eds.id === newEdge.id)) {
+                setEdges((prev) => [...prev, newEdge]);
+              }
+            }
+          });
+        } else {
+          exactConnections.forEach((eC) => {
+            if (eC.to === nN.id) {
+              const newEdge = {
+                id: `${fN.id}~${nN.id}`,
+                source: fN.id,
+                target: nN.id,
+                markerEnd: {
+                  type: MarkerType.ArrowClosed,
+                },
+              };
+              if (!edges.find((eds) => eds.id === newEdge.id)) {
+                setEdges((prev) => [...prev, newEdge]);
+              }
+            }
+          });
+        }
+      });
+    });
+
+    // remove edges
+    if (currentEdgesToSelectedNode && currentEdgesToSelectedNode.length > 0) {
+      currentEdgesToSelectedNode.forEach((curEdToNds) => {
+        const exactConnections = possibleConnectionsToChildNode.filter(
+          (pC) => curEdToNds.id.split("~")[1] === pC.to
+        );
+
+        exactConnections.forEach((eC) => {
+          const isHaving = edges.find((e) => e.id === `${eC.from}~${eC.to}`);
+          console.log(isHaving);
+          if (isHaving) {
+            setEdges((prev) =>
+              prev.map((e) => {
+                if (e.id === isHaving.id) {
+                  return {
+                    ...isHaving,
+                    target: isHaving.id.split("~")[1],
+                  };
+                }
+                return e;
+              })
+            );
+          } else {
+            const newEdge = {
+              id: `${curEdToNds.id}~${eC.to}`,
+              source: curEdToNds.id,
+              target: eC.to,
+              markerEnd: {
+                type: MarkerType.ArrowClosed,
+              },
+            };
+            console.log(edges);
+            console.log(newEdge);
+            console.log(
+              "Present edge:",
+              edges.find(
+                (e) =>
+                  e.id === curEdToNds.source && e.target === selectedNode.id
+              )
+            );
+
+            setEdges((prev) => [...prev, newEdge]);
+          }
+        });
+      });
+    }
   };
 
   const createNewNodes = (parentNode: Node) => {
@@ -160,7 +350,9 @@ function Codebase() {
 
       return nodeData;
     });
-    createNewEdges(parentNode, newNodes);
+    if (!parentNode.id.includes(".")) {
+      createNewEdges(parentNode, newNodes);
+    }
     setNodes((prev) => prev.concat(newNodes));
   };
 
@@ -169,21 +361,11 @@ function Codebase() {
     growingHeight: any,
     growingWidth: any
   ) => {
-    // const isSameYNodeExpand: Node[] = nodes.filter(
-    //   (nds: Node) =>
-    //     nds.position.y === selectedNode.position.y &&
-    //     nds.data.isExpand !== undefined &&
-    //     nds.data.isExpand === true
-    // );
-
-    // const isSameXNodeExpand: Node[] = nodes.filter(
-    //   (nds: Node) =>
-    //     nds.position.x === selectedNode.position.x &&
-    //     nds.data.isExpand !== undefined &&
-    //     nds.data.isExpand === true
-    // );
-
-    // console.log(isSameYNodeExpand, isSameXNodeExpand);
+    const passingNode = {
+      ...selectedNode,
+      width: selectedNode.width + growingWidth,
+      height: selectedNode.height + growingHeight,
+    };
 
     if (selectedNode.data.depth === 0) {
       return;
@@ -195,30 +377,73 @@ function Codebase() {
 
     setNodes((prev) =>
       prev.map((nds) => {
-        const exactNode = sameLevelNodes.find((n) => n.id === nds.id);
+        const exactNode = sameLevelNodes.find(
+          (n) => n.id === nds.id && n.id !== selectedNode.id
+        );
         if (exactNode) {
           const isSameParent = selectedNode.parentNode === nds.parentNode;
           if (isSameParent) {
-            if (nds.position.y > selectedNode.position.y) {
+            const trarverseX = nds.position.x + growingWidth;
+            const trarverseY = nds.position.y + growingHeight;
+
+            if (
+              nds.position.y > selectedNode.position.y &&
+              nds.position.x >= selectedNode.position.x
+            ) {
               return {
                 ...nds,
                 position: {
                   x: nds.position.x,
-                  y: nds.position.y + growingHeight,
+                  y: trarverseY,
                 },
               };
             }
-            if (nds.position.y === selectedNode.position.y) {
-              if (nds.position.x > selectedNode.position.x) {
+            if (
+              nds.position.y === selectedNode.position.y &&
+              nds.position.x > selectedNode.position.x
+            ) {
+              return {
+                ...nds,
+                position: {
+                  x: trarverseX,
+                  y: nds.position.y,
+                },
+              };
+            }
+
+            if (
+              nds.position.y < selectedNode.position.y &&
+              nds.position.x >= selectedNode.position.x
+            ) {
+              const nodeCorners = getFourCornPos(nds);
+              if (nodeCorners.bottomLeft.y >= selectedNode.position.y) {
                 return {
                   ...nds,
                   position: {
-                    x: nds.position.x + growingWidth,
+                    x: trarverseX,
                     y: nds.position.y,
                   },
                 };
               }
-              return nds;
+            }
+
+            if (
+              nds.position.y > selectedNode.position.y &&
+              nds.position.x < selectedNode.position.x
+            ) {
+              const nodeCorners = getFourCornPos(passingNode);
+              if (
+                nodeCorners.bottomLeft.y >= nds.position.y &&
+                nodeCorners.bottomLeft.x < nds.position.x + nds.width!!
+              ) {
+                return {
+                  ...nds,
+                  position: {
+                    x: nds.position.x,
+                    y: trarverseY,
+                  },
+                };
+              }
             }
             return nds;
           }
@@ -238,10 +463,10 @@ function Codebase() {
   const resizeParentNode = (
     node: Node,
     parentNode: Node,
-    expandSize: any,
+    expandWidth: any,
     expandHeight: any
   ) => {
-    // const realWidth = expandSize - (parentNode.width!! - node.position.x) + 10;
+    // const realWidth = expandWidth - (parentNode.width!! - node.position.x) + 10;
 
     let rightMost = node;
 
@@ -259,7 +484,7 @@ function Codebase() {
     const realWidth = -(
       parentNode.width!! -
       rightMost.position.x -
-      expandSize -
+      expandWidth -
       rightMost.width!! -
       10
     );
@@ -288,38 +513,25 @@ function Codebase() {
     const grandParent = nodes.find(
       (n: Node) => n.id === parentNode.parentNode
     )!!;
-
-    resizeParentNode(
-      parentNode,
-      grandParent,
-      realWidth + parentNode.width!!,
-      expandHeight
-    );
+    if (grandParent) {
+      resizeParentNode(
+        parentNode,
+        grandParent,
+        realWidth + parentNode.width!!,
+        expandHeight
+      );
+    }
   };
 
-  const expandNode = (node: Node) => {
+  const expandNode = async (node: Node) => {
     const { dummyWidth } = getChildrenBiggestSize(node);
     const numElOnRow = Math.ceil(Math.sqrt(node.data.children.length));
-    const numElOnCol = Math.ceil(Math.sqrt(node.data.children.length));
-    console.log(numElOnRow, numElOnCol);
-    // const growthHeight =
-    //   (node.data.children.length + 1) * node.height!! +
-    //   node.data.children.length * gap +
-    //   padding;
-    const growthHeight =
-      node.height!! + (node.height!! + gap) * numElOnCol + padding;
+    const numElOnCol = Math.ceil(node.data.children.length / numElOnRow);
+
+    const growthHeight = (node.height!! + gap) * (numElOnCol + 1) + padding;
     const growthWidth =
       (gap + dummyWidth) * numElOnRow + padding * 3 + iconSize;
     const parentNode = nodes.find((n: Node) => n.id === node.parentNode)!!;
-
-    if (parentNode) {
-      resizeParentNode(
-        node,
-        parentNode,
-        growthWidth - node.width!!,
-        growthHeight - node.height!!
-      );
-    }
 
     setNodes((prev) =>
       prev.map((nds) => {
@@ -345,11 +557,20 @@ function Codebase() {
       })
     );
 
-    rearangedNode(
+    await rearangedNode(
       node,
       growthHeight - node.height!!,
       growthWidth - node.width!!
     );
+
+    if (parentNode) {
+      resizeParentNode(
+        node,
+        parentNode,
+        growthWidth - node.width!!,
+        growthHeight - node.height!!
+      );
+    }
   };
 
   const onNodeClick = (event: any, node: Node) => {
