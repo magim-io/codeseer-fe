@@ -1,17 +1,11 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useRef, useState } from "react";
-// eslint-disable-next-line import/no-extraneous-dependencies
-import ReactQuill from "react-quill";
 
 import { ChevronDown, CloseIcon } from "../../Icons";
-import OrganizationService from "../../services/organization.service";
 
-import "./style.scss";
-
-function CreateOrganization({ setIsShown }: any) {
+function CreateTeamForm({ setIsShown }: any) {
   const labelDropdown = useRef<HTMLUListElement>(null);
   const [selectedLabel, setSelectedLabel] = useState("");
-  const [value, setValue] = useState("");
 
   const openLabelDropdown = () => {
     if (labelDropdown.current!!.classList.contains("invisible")) {
@@ -34,24 +28,7 @@ function CreateOrganization({ setIsShown }: any) {
     openLabelDropdown();
   };
 
-  const handleCreateOrg = async (event: any) => {
-    event.preventDefault();
-    const { organizationName, organizationLogin } = event.target;
-
-    try {
-      const res = await OrganizationService.createNewOrganization({
-        login: organizationLogin.value as string,
-        name: organizationName.value,
-        description: value,
-      });
-
-      if (res.data.success) {
-        closeModal();
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const handleCreateTeam = () => {};
 
   return (
     <section className="fixed inset-0  py-14  flex justify-center z-20">
@@ -60,45 +37,60 @@ function CreateOrganization({ setIsShown }: any) {
         onClick={closeModal}
       />
       <form
-        onSubmit={handleCreateOrg}
+        onSubmit={handleCreateTeam}
         className="w-[600px] h-fit overflow-y-auto  flex flex-col bg-white rounded-xl z-40 "
       >
         <div className=" p-6 border-b border-md_blue flex justify-between">
-          <h1 className="text-md_blue text-3xl font-semibold">
-            Create Organization
-          </h1>
+          <h1 className="text-md_blue text-3xl font-semibold">Create Team</h1>
           <CloseIcon onClick={closeModal} />
         </div>
         <div className="w-full h-full flex flex-col gap-5 px-6 pt-4 pb-8">
           <div className=" flex flex-col gap-3">
-            <label htmlFor="organization_name" className="text-lg font-medium">
-              Organization Name
+            <label htmlFor="team_name" className="text-lg font-medium">
+              Name
             </label>
             <input
-              id="organization_name"
-              name="organizationName"
+              id="team_name"
+              name="teamName"
               type="text"
               className="py-4 px-7 border border-gray-400 rounded-md placeholder:text-gray-500"
-              placeholder="Meta, Google, Azure,..."
+              placeholder="CodeSeer, Magim, Four,..."
               required
             />
           </div>
-          <div className="flex flex-col gap-3">
-            <label htmlFor="organization_login" className="text-lg font-medium">
+          <div className=" flex flex-col gap-3">
+            <label htmlFor="team_login" className="text-lg font-medium">
               Login
             </label>
             <input
-              id="organization_login"
-              name="organizationLogin"
+              id="team_login"
+              name="teamLogin"
+              type="text"
+              className="py-4 px-7 border border-gray-400 rounded-md placeholder:text-gray-500"
+              placeholder="CodeSeer, Magim, Four,..."
+              required
+            />
+          </div>
+          <div className=" flex flex-col gap-3">
+            <label
+              htmlFor="team_maximum_members"
+              className="text-lg font-medium"
+            >
+              Maximum Members
+            </label>
+            <input
+              id="team_maximum_members"
+              name="teamMaximumMembers"
               type="text"
               className="py-4 px-7 border border-gray-400 rounded-md placeholder:text-gray-500"
               placeholder="Meta, Google, Azure,..."
               required
             />
           </div>
+
           <div className="flex flex-col gap-3 relative">
             <label htmlFor="organization_login" className="text-lg font-medium">
-              Label
+              Add members
             </label>
             <button
               type="button"
@@ -123,50 +115,35 @@ function CreateOrganization({ setIsShown }: any) {
                 className="py-4 px-6 cursor-pointer hover:bg-primary_blue hover:text-white"
                 role="option"
                 aria-selected
-                onClick={() => selectLabelItem("Onboarding")}
+                onClick={() => selectLabelItem("Ken Nguyen")}
               >
-                Onboarding
+                Ken Nguyen
               </li>
               <li
                 className="py-4 px-6 cursor-pointer hover:bg-primary_blue hover:text-white"
                 role="option"
                 aria-selected
-                onClick={() => selectLabelItem("Maintenace")}
+                onClick={() => selectLabelItem("Nhat Hoang")}
               >
-                Maintenace
+                Nhat Hoang
               </li>
               <li
                 className="py-4 px-6 cursor-pointer hover:bg-primary_blue hover:text-white"
                 role="option"
                 aria-selected
-                onClick={() => selectLabelItem("Migrating")}
+                onClick={() => selectLabelItem("Tony Quach")}
               >
-                Migrating
+                Tony Quach
               </li>
               <li
                 className="py-4 px-6 cursor-pointer hover:bg-primary_blue hover:text-white"
                 role="option"
                 aria-selected
-                onClick={() => selectLabelItem("Continuous")}
+                onClick={() => selectLabelItem("Nhat Hoang")}
               >
-                Continuous
+                Nhat Hoang
               </li>
             </ul>
-          </div>
-          <div className="flex flex-col gap-3 relative mb-10">
-            <label
-              htmlFor="organization_description"
-              className="text-lg font-medium"
-            >
-              Description
-            </label>
-            <ReactQuill
-              id="organization_description"
-              className="h-[120px] "
-              theme="snow"
-              value={value}
-              onChange={setValue}
-            />
           </div>
         </div>
         <div className="p-6 border-t border-md_blue w-full flex justify-end">
@@ -182,4 +159,4 @@ function CreateOrganization({ setIsShown }: any) {
   );
 }
 
-export default CreateOrganization;
+export default CreateTeamForm;

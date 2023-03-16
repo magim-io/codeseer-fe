@@ -1,11 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+@import "./utils/color.scss";
 html {
   font-family: "Roboto", "Open Sans", "sans-serif";
   font-size: 14px;
-  color: #172b4d;
+  color: $primary_text;
 }
 
 * {
@@ -19,7 +19,7 @@ html {
   }
   &::-webkit-scrollbar-thumb {
     border-radius: 12px;
-    background-color: #29678c;
+    background-color: $drark_blue;
   }
   scroll-behavior: smooth;
 }

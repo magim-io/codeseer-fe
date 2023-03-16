@@ -1,27 +1,33 @@
-import React, { useCallback } from 'react';
+import React, { useCallback } from "react";
 import {
   addEdge,
   Background,
   Controls,
   Edge,
-  MarkerType,
   MiniMap,
   Node,
   ReactFlow,
   useEdgesState,
   useNodesState,
-} from 'reactflow';
+} from "reactflow";
 
 import {
   CustomNode,
   FloatingConnectionLine,
   FloatingEdge,
-} from '../../components';
+} from "../../components";
+import { ChevronRight, ClipboardText } from "../../Icons";
 
-import { initialEdges, initialNodes } from './initial_setup';
-import data from './output.json';
+import ActionBar from "./ActionBar/ActionBar";
+import FloatingActionBar from "./FloatingActionBar/FloatingActionBar";
+import { initialEdges, initialNodes } from "./initial_setup";
+import data from "./output.json";
 
-import './style.scss';
+import "./style.scss";
+
+const padding = 10;
+const gap = 10;
+const iconSize = 24;
 
 const nodeTypes = {
   selectorNode: CustomNode,
@@ -31,12 +37,12 @@ const edgeTypes = {
 };
 
 function getChildrenBiggestSize(node: Node) {
-  let longestString = '';
-  let shortestString = '';
+  let longestString = "";
+  let shortestString = "";
   node.data.children.forEach((child: any) => {
     let string = `${child.name}/`;
-    if (child.name.includes('.')) {
-      string = child.name.split('/')[child.name.split('/').length - 1];
+    if (child.name.includes(".")) {
+      string = child.name.split("/")[child.name.split("/").length - 1];
     }
     if (longestString.length <= string.length) {
       longestString = string;
@@ -46,10 +52,10 @@ function getChildrenBiggestSize(node: Node) {
   });
 
   // Get the biggest Size
-  const long = document.createElement('span');
-  long.style.visibility = 'hidden';
-  long.style.fontSize = '16px';
-  long.style.padding = '10px';
+  const long = document.createElement("span");
+  long.style.visibility = "hidden";
+  long.style.fontSize = "16px";
+  long.style.padding = "10px";
   long.innerHTML = longestString;
   document.body.appendChild(long);
 
@@ -60,10 +66,10 @@ function getChildrenBiggestSize(node: Node) {
   document.body.removeChild(long);
 
   // Get the biggest Size
-  const short = document.createElement('span');
-  short.style.visibility = 'hidden';
-  short.style.fontSize = '16px';
-  short.style.padding = '10px';
+  const short = document.createElement("span");
+  short.style.visibility = "hidden";
+  short.style.fontSize = "16px";
+  short.style.padding = "10px";
   short.innerHTML = shortestString;
   document.body.appendChild(short);
 
@@ -73,7 +79,7 @@ function getChildrenBiggestSize(node: Node) {
   // Remove the short element
   document.body.removeChild(short);
 
-  const dummyWidth = (longWidth + shortWidth) / 2;
+  const dummyWidth = (longWidth + shortWidth) / 2 + iconSize;
   const dummyHeight = (longHeight + shortHeight) / 2;
   return { dummyWidth, dummyHeight };
 }
@@ -87,9 +93,36 @@ function Codebase() {
     [setEdges]
   );
 
+  const createNewEdges = (selectedNode: Node, newNodes: Node[]) => {
+    console.log(selectedNode, newNodes);
+
+    // const returnEdges: any[] = childrenNodes
+    //   .filter((item: any) => {
+    //     const connects = data.edges.filter((connect) =>
+    //       connect.from.includes(item.id)
+    //     );
+
+    //     return item.id.includes(".") && connects.length > 0;
+    //   })
+    //   .map((item: any) => {
+    //     const connects = data.edges.filter((connect) =>
+    //       connect.from.includes(item.id)
+    //     );
+
+    //     return connects.map((connect) => ({
+    //       id: `${item.id}-${connect.to}`,
+    //       source: item.id,
+    //       target: childrenNodes.find((c: any) => connect.to.includes(c.id)),
+    //       markerEnd: {
+    //         type: MarkerType.ArrowClosed,
+    //       },
+    //     }));
+    //   });
+
+    // setEdges(returnEdges);
+  };
+
   const createNewNodes = (parentNode: Node) => {
-    const padding = 10;
-    const gap = 10;
     const { dummyWidth } = getChildrenBiggestSize(parentNode);
     const numOfRow = Math.ceil(Math.sqrt(parentNode.data.children.length));
     const numOfCol = Math.ceil(Math.sqrt(parentNode.data.children.length));
@@ -97,16 +130,14 @@ function Codebase() {
       const nodeData = {
         id: cN.name,
         position: {
-          // x: parentNode.width!! + 20,
-          // y: parentNode.height!! * (index + 1) + (index + 1) * gap,
           x: (index % numOfRow) * (dummyWidth + gap) + padding,
           y:
             parentNode.height!! +
             gap +
             Math.floor(index / numOfCol) * (parentNode.height!! + gap),
         },
-        type: 'selectorNode',
-        data: !cN.name.includes('.')
+        type: "selectorNode",
+        data: !cN.name.includes(".")
           ? {
               label: cN.name,
               children: cN.children ? cN.children : undefined,
@@ -119,65 +150,40 @@ function Codebase() {
               depth: parentNode.data.depth + 1,
             },
         style: {
-          border: '1px solid black',
-          borderRadius: '8px',
+          border: "1px solid black",
+          borderRadius: "8px",
         },
         parentNode: parentNode.id,
 
-        extent: 'parent',
+        extent: "parent",
       };
 
       return nodeData;
     });
+    createNewEdges(parentNode, newNodes);
     setNodes((prev) => prev.concat(newNodes));
   };
 
-  const createNewEdges = (selectedNode: Node, nodesList: Node[]) => {
-    const arr = selectedNode.data.children
-      .map((child: any) => ({
-        ...child,
-        id: child.name,
-      }))
-      .concat(nodesList);
-
-    const returnEdges: Edge[] = arr
-      .filter((item: any) => {
-        const connects = data.edges.filter((connect) =>
-          connect.from.includes(item.id)
-        );
-
-        return item.id.includes('.') && connects.length > 0;
-      })
-      .map((item: any) => {
-        const connects = data.edges.filter((connect) =>
-          connect.from.includes(item.id)
-        );
-
-        return connects.map((connect) => ({
-          id: `${item.id}-${connect.to}`,
-          source: item.id,
-          target: arr.find((c: any) => connect.to.includes(c.id)),
-          markerEnd: {
-            type: MarkerType.ArrowClosed,
-          },
-        }));
-      });
-
-    setEdges(returnEdges);
-  };
   const rearangedNode = (
     selectedNode: Node,
     growingHeight: any,
     growingWidth: any
   ) => {
-    // setNodes((prev) =>
-    //   prev.map((node) => {
-    //     if (node.depth === 0) {
-    //       return node;
-    //     } else {
-    //     }
-    //   })
+    // const isSameYNodeExpand: Node[] = nodes.filter(
+    //   (nds: Node) =>
+    //     nds.position.y === selectedNode.position.y &&
+    //     nds.data.isExpand !== undefined &&
+    //     nds.data.isExpand === true
     // );
+
+    // const isSameXNodeExpand: Node[] = nodes.filter(
+    //   (nds: Node) =>
+    //     nds.position.x === selectedNode.position.x &&
+    //     nds.data.isExpand !== undefined &&
+    //     nds.data.isExpand === true
+    // );
+
+    // console.log(isSameYNodeExpand, isSameXNodeExpand);
 
     if (selectedNode.data.depth === 0) {
       return;
@@ -292,8 +298,6 @@ function Codebase() {
   };
 
   const expandNode = (node: Node) => {
-    const padding = 10;
-    const gap = 10;
     const { dummyWidth } = getChildrenBiggestSize(node);
     const numElOnRow = Math.ceil(Math.sqrt(node.data.children.length));
     const numElOnCol = Math.ceil(Math.sqrt(node.data.children.length));
@@ -304,7 +308,8 @@ function Codebase() {
     //   padding;
     const growthHeight =
       node.height!! + (node.height!! + gap) * numElOnCol + padding;
-    const growthWidth = (gap + dummyWidth) * numElOnRow + padding;
+    const growthWidth =
+      (gap + dummyWidth) * numElOnRow + padding * 3 + iconSize;
     const parentNode = nodes.find((n: Node) => n.id === node.parentNode)!!;
 
     if (parentNode) {
@@ -339,6 +344,7 @@ function Codebase() {
         return nds;
       })
     );
+
     rearangedNode(
       node,
       growthHeight - node.height!!,
@@ -347,37 +353,51 @@ function Codebase() {
   };
 
   const onNodeClick = (event: any, node: Node) => {
-    if (node.data.label.includes('.')) {
+    if (node.data.label.includes(".")) {
       return;
     }
 
     if (!node.data.isExpand) {
       expandNode(node);
       createNewNodes(node);
-      createNewEdges(node, nodes);
     }
   };
 
   return (
-    <div className='w-full min-h-screen flex flex-col'>
-      {/* **********************************BODY******************************************* */}
-      <div className='flex-grow w-full h-screen relative'>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          connectionLineComponent={FloatingConnectionLine}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
-          fitView
-          onNodeClick={onNodeClick}
-        >
-          <MiniMap />
-          <Controls />
-          <Background />
-        </ReactFlow>
+    <div className="w-full min-h-screen flex ">
+      <ActionBar />
+      <div className="flex-grow w-full h-full flex flex-col relative">
+        <div className="px-7 py-6 flex justify-between bg-[#F7F8FA] border-b-2 border-[#E3E3E3] drop-shadow-md">
+          <div className="flex gap-3 text-lg font-semibold">
+            <span className="text-md_blue">FPLMS</span>
+            <ChevronRight className="text-md_blue" />
+            <span className="text-primary_gray">Battle Maids&apos; Domain</span>
+            <ChevronRight className="text-md_blue" />
+            <span className="text-primary_blue">
+              Kennguyen2000/facebook-instagram-mobile
+            </span>
+          </div>
+          <ClipboardText className="text-dark_blue_2 cursor-pointer" />
+        </div>
+        <div className="flex grow w-full h-screen relative">
+          <FloatingActionBar />
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            connectionLineComponent={FloatingConnectionLine}
+            nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
+            fitView
+            onNodeClick={onNodeClick}
+          >
+            <MiniMap />
+            <Controls />
+            <Background />
+          </ReactFlow>
+        </div>
       </div>
     </div>
   );

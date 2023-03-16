@@ -3,12 +3,14 @@ import React, { useRef, useState } from "react";
 import logo from "../../assets/images/codeseer_logo.png";
 import useClickOutside from "../../hooks/useClickOutside";
 import { BellFillIcon, PlusIcon, SearchIcon } from "../../Icons";
+import CreateDomainForm from "../CreateDomainForm/CreateDomainForm";
 import CreateOrganization from "../CreateOrganization/CreateOrganization";
 
 function Navbar() {
   const avatarDropdownRef = useRef<HTMLUListElement>(null);
   const avatarDropdownWrapperRef = useRef<HTMLDivElement>(null);
   const [showCreateOrganization, setShowCreateOrganization] = useState(false);
+  const [showCreateDomain, setShowCreateDomain] = useState(false);
 
   const showAvatarDropdown = () => {
     const check = avatarDropdownRef.current?.classList.contains("invisible");
@@ -39,6 +41,12 @@ function Navbar() {
           setIsShown={setShowCreateOrganization}
         />
       )}
+      {showCreateDomain && (
+        <CreateDomainForm
+          isShown={showCreateDomain}
+          setIsShown={setShowCreateDomain}
+        />
+      )}
       <div className="navbar flex justify-between items-center px-12 py-4  border-b border-gray-300 bg-md_blue z-10 shadow-sm">
         {/* ***************************LEFT NAV BAR******************************* */}
         <div className="flex gap-4 items-center cursor-pointer">
@@ -50,7 +58,7 @@ function Navbar() {
           <SearchIcon className="text-white w-[18px] h-[18px]" />
           <input
             type="text"
-            className="w-full focus:border-none focus:outline-none text-white bg-transparent text-xs placeholder:italic placeholder:text-white flex items-center"
+            className="w-full focus:border-none focus:outline-none text-white bg-transparent text-sm placeholder:italic placeholder:text-white flex items-center"
             placeholder="What are you searching for..."
           />
         </div>
@@ -59,20 +67,21 @@ function Navbar() {
           <BellFillIcon className="w-5 h-5 text-white cursor-pointer hover:scale-110 transition duration-200" />
           <div className="codebase-plus-icon relative cursor-pointer ">
             <PlusIcon className="w-5 h-5 text-white rounded-full " />
-            <div className="codebase-plus-dropdown absolute right-0 w-fit whitespace-nowrap flex flex-col gap-1 rounded-md bg-white drop-shadow-xl scale-95 opacity-0 invisible transition duration-200 text-gray-700 text-sm z-20">
+            <div className="codebase-plus-dropdown absolute right-0 w-fit whitespace-nowrap flex flex-col items-start gap-1 rounded-md bg-white drop-shadow-xl scale-95 opacity-0 invisible transition duration-200 text-gray-700 text-sm z-20">
               <button
                 type="button"
                 onClick={() => setShowCreateOrganization(true)}
-                className="px-3 py-2 hover:bg-slate-300 rounded-tr-md rounded-tl-md"
+                className="text-left w-full px-3 py-2 hover:bg-slate-300 rounded-tr-md rounded-tl-md"
               >
                 Create Organization
               </button>
-              <a
-                href="/create-domain"
-                className="px-3 py-2 hover:bg-slate-300 rounded-br-md rounded-bl-md"
+              <button
+                type="button"
+                className="text-left w-full px-3 py-2 hover:bg-slate-300 rounded-br-md rounded-bl-md"
+                onClick={() => setShowCreateDomain(true)}
               >
                 Create Domain
-              </a>
+              </button>
             </div>
           </div>
           <div
