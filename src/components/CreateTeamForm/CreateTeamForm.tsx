@@ -60,7 +60,7 @@ function CreateTeamForm({ setIsShown, orgId }: any) {
       >
         <div className=" p-6 border-b border-md_blue flex justify-between">
           <h1 className="text-md_blue text-3xl font-semibold">Create Team</h1>
-          <CloseIcon onClick={closeModal} />
+          <CloseIcon onClick={closeModal} className="cursor-pointer" />
         </div>
         <div className="w-full flex flex-col gap-5 px-6 pt-4 pb-8 h-fit overflow-y-auto">
           <div className=" flex flex-col gap-3">

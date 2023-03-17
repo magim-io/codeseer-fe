@@ -1,8 +1,10 @@
 import React, { useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 
 import logo from "../../assets/images/codeseer_logo.png";
 import useClickOutside from "../../hooks/useClickOutside";
 import { BellFillIcon, PlusIcon, SearchIcon } from "../../Icons";
+import AddMemberForm from "../AddMemberForm/AddMemberForm";
 import CreateDomainForm from "../CreateDomainForm/CreateDomainForm";
 import CreateOrganization from "../CreateOrganization/CreateOrganization";
 
@@ -11,6 +13,9 @@ function Navbar() {
   const avatarDropdownWrapperRef = useRef<HTMLDivElement>(null);
   const [showCreateOrganization, setShowCreateOrganization] = useState(false);
   const [showCreateDomain, setShowCreateDomain] = useState(false);
+  const [showAddMember, setShowAddMember] = useState(false);
+  const { organizationId } = useParams();
+  console.log(organizationId);
 
   const showAvatarDropdown = () => {
     const check = avatarDropdownRef.current?.classList.contains("invisible");
@@ -47,6 +52,9 @@ function Navbar() {
           setIsShown={setShowCreateDomain}
         />
       )}
+      {showAddMember && organizationId && (
+        <AddMemberForm setIsShown={setShowAddMember} orgId={organizationId} />
+      )}
 
       <div className="navbar flex justify-between items-center px-12 py-4  border-b border-gray-300 bg-md_blue z-10 shadow-sm">
         {/* ***************************LEFT NAV BAR******************************* */}
@@ -59,7 +67,7 @@ function Navbar() {
           <SearchIcon className="text-white w-[18px] h-[18px]" />
           <input
             type="text"
-            className="w-full focus:border-none focus:outline-none text-white bg-transparent text-sm placeholder:italic placeholder:text-white flex items-center"
+            className="w-full border-none focus:border-none focus:outline-none text-white bg-transparent text-sm placeholder:italic placeholder:text-white flex items-center"
             placeholder="What are you searching for..."
           />
         </div>
@@ -83,6 +91,15 @@ function Navbar() {
               >
                 Create Domain
               </button>
+              {organizationId && (
+                <button
+                  type="button"
+                  className="text-left w-full px-3 py-2 hover:bg-slate-300 rounded-br-md rounded-bl-md"
+                  onClick={() => setShowAddMember(true)}
+                >
+                  Add Member
+                </button>
+              )}
             </div>
           </div>
           <div

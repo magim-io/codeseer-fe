@@ -26,7 +26,7 @@ function App() {
             element={<LayoutedComponent component={<Home />} />}
           />
           <Route
-            path="/code-base"
+            path="/explorer"
             element={<LayoutedComponent component={<Codebase />} />}
           />
           <Route

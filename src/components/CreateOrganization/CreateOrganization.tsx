@@ -67,7 +67,7 @@ function CreateOrganization({ setIsShown }: any) {
           <h1 className="text-md_blue text-3xl font-semibold">
             Create Organization
           </h1>
-          <CloseIcon onClick={closeModal} />
+          <CloseIcon onClick={closeModal} className="cursor-pointer" />
         </div>
         <div className="w-full h-full flex flex-col gap-5 px-6 pt-4 pb-8">
           <div className=" flex flex-col gap-3">

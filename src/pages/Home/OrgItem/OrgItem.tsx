@@ -27,12 +27,12 @@ function OrgItem({ data }: IOrgItem) {
             QUICK ACCESS
           </h1>
           <span className="cursor-pointer hover:bg-gray-200 px-1 py-2 rounded-md">
-            Domains: Analytic tech debt
+            Login: <span className="uppercase">{data.organization.login}</span>
           </span>
           <span className="w-full flex justify-between items-center cursor-pointer hover:bg-gray-200 px-1 py-1 rounded-md">
             Teams
             <span className="px-4 py-1 rounded-full bg-drark_blue text-white">
-              4
+              0
             </span>
           </span>
         </div>

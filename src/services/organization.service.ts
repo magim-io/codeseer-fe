@@ -54,7 +54,7 @@ class OrganizationService {
     memberEmail,
   }: IInviteMemberToOrg): Promise<AxiosResponse> {
     const res = await interceptor.post(`/organizations/members/invite`, {
-      organiztionId: organizationId,
+      organizationId,
       memberEmail,
     });
 

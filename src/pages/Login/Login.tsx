@@ -31,7 +31,7 @@ function Login() {
         </div>
         <div className="w-full h-[1px] bg-gray-500 my-2" />
         <div className="flex flex-col items-center  gap-1 py-4 text-center text-sm">
-          <p>Not yout? Log in with a different account</p>
+          <p>Not your? Log in with a different account</p>
           <p>
             Need an account?{" "}
             <a href="/login" className="underline">

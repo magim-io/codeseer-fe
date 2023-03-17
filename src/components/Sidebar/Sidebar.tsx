@@ -106,7 +106,7 @@ function Sidebar({ data, domains, teams }: ISidebar) {
                   <button
                     type="button"
                     className="flex items-center gap-2 py-1 text-lg text-md_gray cursor-pointer hover:font-medium"
-                    onClick={() => navigate("/code-base")}
+                    onClick={() => navigate("/explorer")}
                   >
                     <ChevronRight className="w-4 h-4" />
                     {domain.domain.name}
